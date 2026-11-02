@@ -1,5 +1,23 @@
-const nav=document.getElementById('nav');addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>40));
+const nav=document.getElementById('nav');addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>30));
 document.getElementById('burger').onclick=()=>document.getElementById('links').classList.toggle('open');
 const rv=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('in')),{threshold:.1});document.querySelectorAll('.reveal').forEach(e=>rv.observe(e));
 const bt=document.getElementById('blur');if(bt){const walk=n=>{[...n.childNodes].forEach(c=>{if(c.nodeType===3){const f=document.createDocumentFragment();c.textContent.split(/\s+/).filter(Boolean).forEach(w=>{const s=document.createElement('span');s.className='w';s.textContent=w;f.appendChild(s)});c.replaceWith(f)}else walk(c)})};walk(bt);const ws=[...bt.querySelectorAll('.w')];const upd=()=>{const r=bt.getBoundingClientRect(),vh=innerHeight;const p=Math.min(1,Math.max(0,(vh*.85-r.top)/(vh*.55+r.height*.4)));ws.forEach((w,i)=>w.classList.toggle('on',i/ws.length<p))};addEventListener('scroll',upd,{passive:true});upd()}
 const cf=document.getElementById('cform');if(cf)cf.onsubmit=e=>{e.preventDefault();const d=new FormData(cf);location.href='mailto:CHANGE_ME@example.com?subject='+encodeURIComponent(d.get('subject'))+'&body='+encodeURIComponent(d.get('message')+'\n\n'+d.get('name')+' ('+d.get('email')+') '+d.get('org'))};
+/* 15-second hand check */
+const hs=document.getElementById('handStage');if(hs){
+const STEPS=[[3,'Look at your hand','Just look at it. Nothing else.',0],[3,'Pick one finger in your mind','Decide to lift it, but do NOT move it.',1],[2,'Switch to a different finger','Change your mind. Still do not move.',2],[1,'Now lift one finger','Any finger. Go.',3],[6,'Notice what happened','Did it feel smooth, blocked, or did something else move?',4]];
+const fs=[...hs.querySelectorAll('.f')],box=hs.querySelector('.stepbox'),num=hs.querySelector('.ringwrap i'),ring=hs.querySelector('.ring'),btn=hs.querySelector('.go'),res=hs.querySelector('.res');let run=false;
+const C=2*Math.PI*30;ring.style.strokeDasharray=C;const setR=p=>ring.style.strokeDashoffset=C*(1-p);setR(0);
+function clear(){fs.forEach(f=>f.className.baseVal='f')}
+async function go(){if(run)return;run=true;res.classList.remove('show');btn.style.display='none';let left=15;const total=15;
+for(const [sec,t,d,k] of STEPS){clear();if(k==0)fs.forEach(f=>f.classList.add('look'));if(k==1){fs[1].classList.add('hold')}if(k==2){fs[3].classList.add('hold')}if(k==3){fs[2].classList.add('up')}
+box.innerHTML='<b>'+t+'</b><span>'+d+'</span>';
+for(let s=sec;s>0;s--){num.textContent=left;setR((total-left)/total);await new Promise(r=>setTimeout(r,1000));left--}}
+num.textContent='0';setR(1);clear();box.innerHTML='<b>Done. How did it feel?</b><span>Pick the closest one below.</span>';res.classList.add('show');btn.textContent='Try again';btn.style.display='';run=false}
+btn.onclick=go;
+const A={s:'Smooth. Low inner friction and a strong grip on your focus. Your mind follows your intentions well right now.',b:'Blocked. There is a lot of inner friction right now. Try making your next task smaller, or clear your head first (see tip 2).',j:'Your focus slipped mid-thought. Your attention is not holding well at the moment. Shorter work blocks with small breaks can help.',w:'You could not pick a finger. Your mind is wobbling and your energy goes to the easiest option. A tiny, clear first step helps here.',r:'Relief once you moved. You have lots of push built up behind some resistance. Start the thing you are avoiding with a 5-minute timer.'};
+res.querySelectorAll('.opts button').forEach(b=>b.onclick=()=>{res.querySelectorAll('.opts button').forEach(x=>x.classList.remove('on'));b.classList.add('on');const a=res.querySelector('.ans');a.textContent=A[b.dataset.k];a.classList.add('show')})}
+/* five minute timer */
+const tb=document.getElementById('t5');if(tb){let iv=null;tb.onclick=()=>{if(iv){clearInterval(iv);iv=null;tb.textContent='Start 5-minute timer';document.getElementById('t5n').textContent='05:00';return}let s=300;tb.textContent='Stop';iv=setInterval(()=>{s--;const m=String(Math.floor(s/60)).padStart(2,'0'),ss=String(s%60).padStart(2,'0');document.getElementById('t5n').textContent=m+':'+ss;if(s<=0){clearInterval(iv);iv=null;tb.textContent='Start 5-minute timer';document.getElementById('t5n').textContent='Time. What did you notice?'}},1000)}}
+/* article filter */
+const ps=document.getElementById('posts');if(ps){const q=document.getElementById('q'),cards=[...ps.children];let yr='all';const f=()=>{const v=q.value.toLowerCase();cards.forEach(c=>{c.style.display=(c.dataset.t.includes(v)&&(yr==='all'||c.dataset.y===yr))?'':'none'})};q.oninput=f;document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));b.classList.add('on');yr=b.dataset.y;f()})}
