@@ -225,3 +225,11 @@ details.faq{background:#fff;border-radius:20px;padding:6px 24px;margin-bottom:12
 .alb.feature{grid-column:1/-1;background:linear-gradient(135deg,#fff,#f2ede6)}
 .alb.feature .ainfo h3{font-size:2rem}
 @media(prefers-reduced-motion:reduce){.cdi{animation:none!important}}
+
+.mm{background:#fff;border-radius:28px;padding:30px 30px 22px;margin:0 0 30px;box-shadow:0 18px 44px rgba(47,82,56,.09);border:1px solid rgba(64,115,77,.1)}.mm h3{font-size:1.5rem;letter-spacing:-.02em;margin-bottom:6px}.mm>p{color:var(--grey);margin:0 0 16px!important;font-size:.98rem}
+.mm pre.mermaid{background:none;border:0;margin:0;padding:6px 0;overflow-x:auto;display:flex;justify-content:center;font-family:Inter,sans-serif;color:var(--ink);font-size:.9rem;white-space:pre}.mm .mermaid svg{max-width:100%;height:auto}
+.two-mm{display:grid;grid-template-columns:1fr 1fr;gap:26px}.two-mm .mm{margin:0}@media(max-width:900px){.two-mm{grid-template-columns:1fr}.mm{padding:20px 14px}}
+
+.mm .mermaid svg{max-width:860px!important}#decide .mermaid svg{max-width:560px!important}.two-mm .mermaid svg{max-width:100%!important}
+
+#questions .cards{grid-template-columns:repeat(2,1fr)}@media(max-width:700px){#questions .cards{grid-template-columns:1fr}}
