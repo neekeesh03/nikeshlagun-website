@@ -12,7 +12,7 @@ document.addEventListener('click',e=>{
  let u;try{u=new URL(a.href,location.href)}catch(_){return}
  if(u.origin!==location.origin||(u.pathname===location.pathname&&u.hash))return;
  if(RM)return;
- e.preventDefault();document.body.classList.add('pg-out');setTimeout(()=>location.href=a.href,210);
+ e.preventDefault();document.body.classList.add('pg-out');setTimeout(()=>location.href=a.href,130);
 });
 if(HOV&&!RM){
  const ring=document.createElement('div'),dot=document.createElement('div');ring.className='fx-ring';dot.className='fx-dot';document.body.append(ring,dot);
@@ -37,6 +37,9 @@ if(!RM){ // soft parallax on glows
  const gl=$$('.glow');if(gl.length){let tk=false;addEventListener('scroll',()=>{if(tk)return;tk=true;requestAnimationFrame(()=>{const y=scrollY;gl.forEach((g,i)=>{g.style.translate=`0 ${y*(.12+i*.05)}px`});tk=false})},{passive:true})}
 }
 
+// instant navigation: prefetch pages on hover / touch
+const pf=new Set();const prefetch=a=>{try{const u=new URL(a.href,location.href);if(u.origin!==location.origin||pf.has(u.pathname)||u.pathname===location.pathname)return;pf.add(u.pathname);const l=document.createElement('link');l.rel='prefetch';l.href=u.pathname;document.head.append(l)}catch(_){}};
+document.addEventListener('mouseover',e=>{const a=e.target.closest('a[href]');a&&prefetch(a)},{passive:true});document.addEventListener('touchstart',e=>{const a=e.target.closest('a[href]');a&&prefetch(a)},{passive:true});
 /* ---------- 2. music player bar ---------- */
 const albs=$$('.alb[data-audio]');
 if(albs.length){
@@ -82,7 +85,7 @@ if(albs.length){
 /* ---------- 3. research explorer ---------- */
 const mms=$$('.mm');
 if(mms.length){
- const tryEnh=()=>{mms.forEach(mm=>{const svg=$('svg',mm);if(!svg||mm.dataset.pz)return;mm.dataset.pz=1;setTimeout(()=>{const s2=$('svg',mm);if(s2)enh(mm,s2)},700)})};
+ const tryEnh=()=>{mms.forEach(mm=>{const svg=$('svg',mm);if(!svg||mm.dataset.pz||mm.querySelector('.pie'))return;mm.dataset.pz=1;setTimeout(()=>{const s2=$('svg',mm);if(s2)enh(mm,s2)},700)})};
  const mo=new MutationObserver(tryEnh);mms.forEach(m=>mo.observe(m,{childList:true,subtree:true}));tryEnh();setTimeout(tryEnh,2500);setTimeout(tryEnh,6000);
  function enh(mm,svg){
   const box=document.createElement('div');box.className='pz';svg.parentNode.insertBefore(box,svg);box.append(svg);
@@ -149,4 +152,41 @@ if(mms.length){
   mkb('cp','Copy text',true,async()=>{try{await navigator.clipboard.writeText(text);alert('Copied.')}catch(_){}});
  };
 });
+})();
+
+/* ---------- 5. animated pie ---------- */
+(function(){
+ const pies=[...document.querySelectorAll('.pie')];
+ pies.forEach(p=>{
+  const total=+p.dataset.total||1,ring=p.querySelector('.pie-ring'),lis=[...p.querySelectorAll('.pie-leg li')],mid=p.querySelector('.pie-mid'),mb=mid.querySelector('b'),ms=mid.querySelector('span');
+  const R=78,C=2*Math.PI*R,GAP=2.5;let acc=0;const NS='http://www.w3.org/2000/svg';const cs=[];
+  lis.forEach((li,i)=>{const v=+li.dataset.v,len=v/total*C;const c=document.createElementNS(NS,'circle');c.setAttribute('cx',120);c.setAttribute('cy',120);c.setAttribute('r',R);c.setAttribute('stroke',li.dataset.c);c.setAttribute('stroke-width',40);
+   c.style.strokeDasharray='0 '+C;c.style.strokeDashoffset=-acc;c.dataset.len=Math.max(len-GAP,0.5);c.dataset.i=i;ring.append(c);cs.push(c);acc+=len;
+   li.querySelector('em').textContent=Math.round(v/total*100)+'%';
+   const on=()=>hl(i),off=()=>hl(-1);li.addEventListener('mouseenter',on);li.addEventListener('focus',on);li.addEventListener('mouseleave',off);li.addEventListener('blur',off);
+   c.addEventListener('mouseenter',on);c.addEventListener('mouseleave',off);c.addEventListener('click',()=>hl(p.classList.contains('has-hl')&&c.classList.contains('hl')?-1:i))});
+  const base=[mb.textContent,ms.textContent];
+  function hl(i){p.classList.toggle('has-hl',i>=0);cs.forEach((c,k)=>c.classList.toggle('hl',k===i));lis.forEach((l,k)=>l.classList.toggle('hl',k===i));
+   if(i>=0){const l=lis[i];mb.textContent=l.dataset.v;ms.textContent=(l.dataset.v==='1'?'paper':'papers')+', '+l.querySelector('em').textContent}else{mb.textContent=base[0];ms.textContent=base[1]}}
+  let played=false;function play(){if(played)return;played=true;p.classList.add('go');
+   cs.forEach((c,i)=>setTimeout(()=>{c.style.strokeDasharray=c.dataset.len+' '+C},i*170));
+   lis.forEach((l,i)=>l.style.transitionDelay=(i*90+150)+'ms');
+   const t0=performance.now(),dur=1400;(function tick(t){const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);if(!p.classList.contains('has-hl'))mb.textContent=Math.round(e*total);if(k<1)requestAnimationFrame(tick)})(t0)}
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches||!('IntersectionObserver' in window)){played=true;p.classList.add('go');cs.forEach(c=>c.style.strokeDasharray=c.dataset.len+' '+C);return}
+  mb.textContent='0';new IntersectionObserver((es,io)=>{if(es[0].isIntersecting){io.disconnect();play()}},{threshold:.3}).observe(p);
+ });
+})();
+
+/* ---------- 6. free-book lead magnet ---------- */
+(function(){
+ const form=document.querySelector('.lead-form');if(!form)return;
+ const KEY='lagun_lead_v1',box=form.closest('.leadbox'),done=box.querySelector('.lead-done'),err=form.querySelector('.lead-err'),inp=form.querySelector('input'),btn=form.querySelector('button');
+ const show=(again)=>{form.hidden=true;done.hidden=false;if(again)done.querySelector('.lead-msg').textContent='Welcome back.'};
+ try{if(localStorage.getItem(KEY)==='1')show(true)}catch(_){}
+ form.addEventListener('submit',async e=>{e.preventDefault();err.hidden=true;const email=inp.value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){err.textContent='Please enter a valid email address.';err.hidden=false;inp.focus();return}
+  btn.disabled=true;btn.firstChild.textContent='Unlocking... ';
+  try{await fetch('https://nikeshlagun.substack.com/api/v1/free?nojs=true',{method:'POST',mode:'no-cors',body:new URLSearchParams({email,first_url:location.href,first_referrer:document.referrer||'',current_url:location.href,current_referrer:document.referrer||'',referral_code:'',source:'switch-on-free-book'})})}catch(_){}
+  try{localStorage.setItem(KEY,'1')}catch(_){}
+  show(false);done.scrollIntoView({block:'nearest',behavior:'smooth'})});
 })();

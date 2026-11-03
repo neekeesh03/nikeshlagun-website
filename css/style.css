@@ -320,3 +320,9 @@ details.faq{background:#fff;border-radius:20px;padding:6px 24px;margin-bottom:12
 .hand{animation:hbreath 4s ease-in-out infinite}
 @keyframes hbreath{50%{transform:translateY(-4px)}}
 @media(prefers-reduced-motion:reduce){.hand{animation:none}}
+
+/* speed: quicker reveals, lighter below-the-fold work */
+.reveal{transform:translateY(14px)!important}.reveal.in{transform:none!important}
+.reveal{transition:opacity .45s ease-out,transform .45s cubic-bezier(.2,.7,.2,1)!important}
+section.sec,.footer{content-visibility:auto;contain-intrinsic-size:auto 700px}
+img{height:auto}

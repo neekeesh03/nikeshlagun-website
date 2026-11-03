@@ -1,6 +1,6 @@
 const nav=document.getElementById('nav');addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>30));
 document.getElementById('burger').onclick=()=>document.getElementById('links').classList.toggle('open');
-const rv=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('in')),{threshold:.1});document.querySelectorAll('.reveal').forEach(e=>rv.observe(e));
+const rv=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('in')),{threshold:.01,rootMargin:'0px 0px 12% 0px'});document.querySelectorAll('.reveal').forEach(e=>rv.observe(e));
 const bt=document.getElementById('blur');if(bt){const walk=n=>{[...n.childNodes].forEach(c=>{if(c.nodeType===3){const f=document.createDocumentFragment();c.textContent.split(/\s+/).filter(Boolean).forEach(w=>{const s=document.createElement('span');s.className='w';s.textContent=w;f.appendChild(s)});c.replaceWith(f)}else walk(c)})};walk(bt);const ws=[...bt.querySelectorAll('.w')];const upd=()=>{const r=bt.getBoundingClientRect(),vh=innerHeight;const p=Math.min(1,Math.max(0,(vh*.85-r.top)/(vh*.55+r.height*.4)));ws.forEach((w,i)=>w.classList.toggle('on',i/ws.length<p))};addEventListener('scroll',upd,{passive:true});upd()}
 const cf=document.getElementById('cform');if(cf)cf.onsubmit=e=>{e.preventDefault();const d=new FormData(cf);location.href='mailto:lagunnikesh2064@gmail.com?subject='+encodeURIComponent(d.get('subject'))+'&body='+encodeURIComponent(d.get('message')+'\n\n'+d.get('name')+' ('+d.get('email')+') '+d.get('org'))};
 /* 15-second hand check */
@@ -22,7 +22,7 @@ const tb=document.getElementById('t5');if(tb){let iv=null;tb.onclick=()=>{if(iv)
 /* article filter */
 const ps=document.getElementById("posts");if(ps){const q=document.getElementById("q"),cs=[...ps.children];let yr="all",tk="all";const fl=()=>{const v=q.value.toLowerCase();cs.forEach(c=>{c.style.display=(c.dataset.t.includes(v)&&(yr==="all"||c.dataset.y===yr)&&(tk==="all"||c.dataset.k===tk))?"":"none"})};q.oninput=fl;document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{document.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));b.classList.add("on");if(b.dataset.k){tk=b.dataset.k;yr="all"}else{yr=b.dataset.y;tk="all"}fl()})}
 /* auto reveal + stagger */
-document.querySelectorAll('.card,.post,.bk,.review,.store,.sec-head,.cta-box,.eeg-note,.specs>div').forEach((e,i)=>{if(!e.classList.contains('reveal')){e.classList.add('reveal');e.style.transitionDelay=(i%4)*80+'ms';rv.observe(e)}});
+document.querySelectorAll('.card,.post,.bk,.review,.store,.sec-head,.cta-box,.eeg-note,.specs>div').forEach((e,i)=>{if(!e.classList.contains('reveal')){e.classList.add('reveal');e.style.transitionDelay=(i%4)*35+'ms';rv.observe(e)}});
 /* scroll progress */
 const pb=document.createElement('div');pb.className='progress';document.body.appendChild(pb);addEventListener('scroll',()=>{pb.style.width=(scrollY/(document.documentElement.scrollHeight-innerHeight)*100)+'%'},{passive:true});
 /* count up */
