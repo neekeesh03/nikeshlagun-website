@@ -192,3 +192,23 @@ pre.mermaid:has(.pz){display:block!important;padding:0!important;background:none
 .privacy h2{font-size:1.25rem;margin:28px 0 6px}
 .privacy p{color:var(--grey);line-height:1.7}
 .stat em{font-family:Inter,sans-serif!important}
+
+/* ---- phase 2: paths, proof, sticky bar ---- */
+.pathrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;max-width:1040px;margin:0 auto}
+.path{display:flex;flex-direction:column;gap:8px;background:#fff;border-radius:22px;padding:24px;text-decoration:none;color:inherit;box-shadow:0 14px 34px rgba(64,115,77,.09);border:1.5px solid transparent;transition:border-color .25s,translate .25s,box-shadow .25s}
+.path:hover{border-color:var(--orange);translate:0 -5px;box-shadow:0 22px 46px rgba(64,115,77,.16)}
+.path b{font-size:1.08rem;line-height:1.3;color:var(--ink,#222)}
+.path span{color:var(--grey);font-size:.92rem;line-height:1.45;flex:1}
+.path i{font-style:normal;font-weight:600;color:var(--green);font-size:.9rem;margin-top:6px}
+.proof{font-size:.82rem;color:var(--grey);margin:10px 0 0}
+.cta-box .proof{opacity:.9}
+.ladder{margin:16px auto 0;max-width:420px;background:#fff;border-radius:16px;padding:14px 16px;text-align:left;box-shadow:0 10px 24px rgba(64,115,77,.12)}
+.ladder b{display:block;margin-bottom:4px;color:var(--ink,#222)}
+.ladder p{margin:0 0 10px;font-size:.88rem;color:var(--grey)}
+.ladder a{display:inline-block;background:var(--orange);color:#2a1a08;font-weight:600;font-size:.88rem;padding:9px 16px;border-radius:999px;text-decoration:none}
+.lead-next{margin:12px 0 0;font-size:.9rem;color:rgba(255,255,255,.85)}
+.lead-next a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.stickycta{position:fixed;left:12px;right:12px;bottom:12px;z-index:880;display:none;align-items:center;justify-content:space-between;gap:10px;background:var(--green);color:#fff;border-radius:999px;padding:8px 8px 8px 20px;box-shadow:0 14px 34px rgba(0,0,0,.3);transform:translateY(160%);transition:transform .4s cubic-bezier(.2,.9,.3,1);font-weight:600;font-size:.92rem}
+.stickycta.show{transform:none}
+.stickycta a{background:var(--orange);color:#2a1a08;border-radius:999px;padding:10px 16px;text-decoration:none;font-weight:700}
+@media(max-width:720px){.stickycta{display:flex}body.has-pbar .stickycta{display:none}}

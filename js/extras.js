@@ -166,7 +166,7 @@ if(mms.length){
 (function(){
  const form=document.querySelector('.lead-form');if(!form)return;
  const KEY='lagun_lead_v1',box=form.closest('.leadbox'),done=box.querySelector('.lead-done'),err=form.querySelector('.lead-err'),inp=form.querySelector('input'),btn=form.querySelector('button');
- const show=(again)=>{form.hidden=true;done.hidden=false;if(again)done.querySelector('.lead-msg').textContent='Welcome back.'};
+ const show=(again)=>{form.hidden=true;done.hidden=false;const nx=box.querySelector('.lead-next');if(nx)nx.hidden=false;if(again)done.querySelector('.lead-msg').textContent='Welcome back.'};
  try{if(localStorage.getItem(KEY)==='1')show(true)}catch(_){}
  form.addEventListener('submit',async e=>{e.preventDefault();err.hidden=true;const email=inp.value.trim();
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){err.textContent='That email does not look right. Mind checking it?';err.hidden=false;inp.focus();return}
@@ -215,4 +215,24 @@ $$('.flip').forEach(fl=>{
  addEventListener('scroll',()=>{if(pop.classList.contains('on')&&cur)place(cur)},{passive:true});
 })();
 
+})();
+
+/* ---------- 10. conversion helpers ---------- */
+(function(){
+ const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+ const KEY='lagun_lead_v1';let unlocked=false;try{unlocked=localStorage.getItem(KEY)==='1'}catch(_){}
+ const pre=location.pathname.includes('/a/')?'../':'';
+ // proof line beside every email box
+ $$('.cta-box').forEach(b=>{if(!$('.proof',b)){const f=$('form',b);if(f){const p=document.createElement('p');p.className='proof';p.textContent='Join 2,417 readers. Count from Substack, 3 November 2026.';f.after(p)}}});
+ // welcome back: swap the free-book buttons once unlocked
+ if(unlocked){$$('a[href$="switch-on.html#free"]').forEach(a=>{const arrow=a.querySelector('i');const t=document.createElement('span');t.textContent='Open your free book ';a.textContent='';a.append(t);if(arrow)a.append(arrow)})}
+ // after the hand or eye check: next rung of the ladder
+ ['handStage','eyeStage'].forEach(id=>{const st=document.getElementById(id);if(!st)return;const ans=$('.ans',st);if(!ans)return;
+  new MutationObserver(()=>{if(!ans.textContent.trim()||$('.ladder',st))return;const l=document.createElement('div');l.className='ladder';
+   l.innerHTML=unlocked?'<b>Keep going</b><p>Your result is the first step. Your free book explains what to do with it.</p><a href="'+pre+'switch-on.html#free">Open your free book</a>':'<b>Your result is step one</b><p>Switch On explains why your mind did this and what to try next. Unlock it free in 10 seconds.</p><a href="'+pre+'switch-on.html#free">Unlock my free copy</a>';
+   st.querySelector('.res').append(l)}).observe(ans,{childList:true,characterData:true,subtree:true})});
+ // slim mobile bar
+ if(!unlocked&&!/switch-on\.html|privacy\.html|music\.html/.test(location.pathname)){
+  const b=document.createElement('div');b.className='stickycta';b.innerHTML='<span>Switch On, free</span><a href="'+pre+'switch-on.html#free">Unlock my copy</a>';document.body.append(b);
+  let shown=false;addEventListener('scroll',()=>{const s=scrollY>620&&scrollY<document.documentElement.scrollHeight-innerHeight-500;if(s!==shown){shown=s;b.classList.toggle('show',s)}},{passive:true})}
 })();
