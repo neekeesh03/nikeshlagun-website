@@ -49,7 +49,6 @@ h2{font-size:clamp(1.9rem,3.8vw,3rem);line-height:1.12;letter-spacing:-.03em;fon
 /* try it */
 .try{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;background:#fff;border-radius:34px;padding:44px;box-shadow:0 24px 60px rgba(47,82,56,.12)}
 .hand-stage{background:var(--mint-l);border-radius:26px;padding:26px;text-align:center;min-height:420px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
-.hand{width:230px;height:250px}.hand .f{fill:#f3d9c4;stroke:#c9a487;stroke-width:2;transition:.25s;transform-box:fill-box;transform-origin:50% 100%}.hand .palm{fill:#f3d9c4;stroke:#c9a487;stroke-width:2}.hand .f.look{fill:var(--lav-l);stroke:var(--lav)}.hand .f.hold{fill:var(--lav);stroke:#8b79bb}.hand .f.up{fill:var(--orange);stroke:#b56d2f;transform:translateY(-14px)}
 .stepbox{min-height:78px}.stepbox b{display:block;font-size:1.25rem;letter-spacing:-.01em}.stepbox span{color:var(--grey)}
 .ringwrap{position:relative;width:74px;height:74px}.ringwrap svg{transform:rotate(-90deg)}.ringwrap i{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-weight:700;font-size:1.3rem;color:var(--green-d)}
 .res{display:none;text-align:left;width:100%}.res.show{display:block}.res h4{margin-bottom:10px}.opts{display:grid;gap:8px}.opts button{font:inherit;text-align:left;background:#fff;border:1.5px solid rgba(64,115,77,.25);border-radius:14px;padding:11px 14px;cursor:pointer;transition:.2s}.opts button:hover,.opts button.on{background:var(--green);color:#fff;border-color:var(--green)}.ans{margin-top:12px;background:#fff;border-radius:14px;padding:14px 16px;color:var(--ink);display:none}.ans.show{display:block}
@@ -299,3 +298,25 @@ details.faq{background:#fff;border-radius:20px;padding:6px 24px;margin-bottom:12
 .alb.playing .sleeve{box-shadow:0 14px 34px rgba(64,115,77,.35)}
 .ainfo{position:relative}
 .ainfo .playbtn{display:flex;width:max-content}.ainfo .tag{display:inline-block;margin-bottom:6px}
+
+/* hand figure v2 */
+.hand{width:270px;height:310px;overflow:visible;filter:drop-shadow(0 14px 18px rgba(64,115,77,.16))}
+.hand .fp,.hand .palm{fill:url(#skin);stroke:#d3a583;stroke-width:2;stroke-linejoin:round;transition:fill .3s,stroke .3s}
+.hand .palm{stroke-width:2}
+.hand .nail{fill:#fff3ea;stroke:#e2bda0;stroke-width:1.2;transition:.3s}
+.hand .crease{fill:none;stroke:#d9ae8e;stroke-width:1.8;stroke-linecap:round;opacity:.7}
+.hand .wrist{fill:#ecc3a2}
+.hand .cuff{fill:url(#cuff)}
+.hand .aura{opacity:0;transition:opacity .5s}
+.hand .f{fill:none;stroke:none;transform-box:view-box;transition:transform .35s cubic-bezier(.3,1.6,.5,1);animation:none}
+.hand .f.look .fp{fill:#e8e0f5;stroke:var(--lav)}
+.hand .f.hold .fp{fill:var(--lav);stroke:#8b79bb}
+.hand .f.hold .nail{fill:#f1ecfa}
+.hand .f.up .fp{fill:var(--orange);stroke:#b56d2f}
+.hand .f.up .nail{fill:#ffd9b3;stroke:#b56d2f}
+.hand .f.up{translate:0 -22px}
+.hand .f.hold{translate:0 -4px}
+.hand-stage:has(.f.look) .aura,.hand-stage:has(.f.hold) .aura{opacity:1}
+.hand{animation:hbreath 4s ease-in-out infinite}
+@keyframes hbreath{50%{transform:translateY(-4px)}}
+@media(prefers-reduced-motion:reduce){.hand{animation:none}}
