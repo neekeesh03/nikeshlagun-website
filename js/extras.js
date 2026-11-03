@@ -180,18 +180,39 @@ if(mms.length){
 /* ---------- 7. timeline reveal ---------- */
 $$('.rtl').forEach(t=>{if(!('IntersectionObserver' in window)){t.classList.add('go');return}new IntersectionObserver((es,io)=>{if(es[0].isIntersecting){io.disconnect();t.classList.add('go')}},{threshold:.25}).observe(t)});
 
-/* ---------- 8. page-flip book ---------- */
+/* ---------- 8. page-flip book (glide the cursor to turn pages) ---------- */
 $$('.flip').forEach(fl=>{
- const leaves=$$('.leaf',fl),n=leaves.length,wrap=fl.closest('.flipwrap'),prev=$('.fprev',wrap),next=$('.fnext',wrap),dots=$$('.flipdots i',wrap);let cur=0;
- const setZ=()=>leaves.forEach((l,i)=>{l.style.zIndex=l.classList.contains('f')?i+1:n-i});
- function render(){leaves.forEach((l,i)=>l.classList.toggle('f',i<cur));fl.classList.toggle('mid',cur>0&&cur<n);fl.classList.toggle('end',cur===n);prev.disabled=cur===0;next.disabled=cur===n;
-  dots.forEach((d,i)=>d.classList.toggle('on',i===cur));setTimeout(setZ,380)}
- function go(d){cur=Math.max(0,Math.min(n,cur+d));render()}
- prev.onclick=()=>go(-1);next.onclick=()=>go(1);
- leaves.forEach((l,i)=>l.addEventListener('click',e=>{if(e.target.closest('a,button'))return;cur=l.classList.contains('f')?i:i+1;render()}));
- wrap.setAttribute('tabindex','0');wrap.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1)});
- setZ();render();
- if('IntersectionObserver' in window&&!matchMedia('(prefers-reduced-motion:reduce)').matches)new IntersectionObserver((es,io)=>{if(es[0].isIntersecting){io.disconnect();setTimeout(()=>{if(cur===0)go(1)},900)}},{threshold:.6}).observe(fl);
+ const leaves=$$('.leaf',fl),n=leaves.length,wrap=fl.closest('.flipwrap');let p=0,target=0,raf=0,drag=null;
+ const RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+ function paint(){leaves.forEach((l,i)=>{const t=Math.max(0,Math.min(1,p-i));const ang=-180*t;l.style.transform='rotateY('+ang+'deg)';l.style.zIndex=t>.5?i+1:n-i;l.style.setProperty('--s',Math.sin(t*Math.PI).toFixed(3))});
+  const sh=p<1?-.5*(1-p):(p>n-1?.5*(p-(n-1)):0);fl.style.transform='translateX(calc(var(--w)*'+sh+'))'}
+ function loop(){p+=(target-p)*(RM?1:.11);if(Math.abs(target-p)<.002)p=target;paint();raf=Math.abs(target-p)>=.002?requestAnimationFrame(loop):0}
+ const go=t=>{target=Math.max(0,Math.min(n,t));if(!raf)raf=requestAnimationFrame(loop)};
+ const area=wrap.querySelector('.flipstage')||wrap;
+ area.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;const r=area.getBoundingClientRect();const x=(e.clientX-r.left)/r.width;go((x-.12)/.76*n)});
+ area.addEventListener('pointerleave',e=>{if(e.pointerType==='touch')return;go(Math.round(target))});
+ area.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')return;drag={x:e.clientX,p:target}});
+ area.addEventListener('pointermove',e=>{if(!drag||e.pointerType!=='touch')return;const w=fl.getBoundingClientRect().width/2;go(drag.p+(e.clientX-drag.x)/w*1.4)});
+ const end=()=>{if(drag){drag=null;go(Math.round(target))}};area.addEventListener('pointerup',end);area.addEventListener('pointercancel',end);
+ area.style.touchAction='pan-y';
+ wrap.setAttribute('tabindex','0');wrap.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(Math.round(target)+1);if(e.key==='ArrowLeft')go(Math.round(target)-1)});
+ paint();
+ // intro: page 1 lifts to show it is alive
+ if('IntersectionObserver' in window&&!RM)new IntersectionObserver((es,io)=>{if(es[0].isIntersecting){io.disconnect();setTimeout(()=>{if(target===0){go(1);setTimeout(()=>{if(target===1)go(0)},1400)}},700)}},{threshold:.6}).observe(fl);
 });
+
+/* ---------- 9. sticker note on hover ---------- */
+(function(){
+ if(!matchMedia('(hover:hover) and (pointer:fine)').matches)return;
+ const src=document.querySelector('.stk');if(!src)return;
+ const pop=document.createElement('div');pop.className='stk-pop';pop.innerHTML=src.innerHTML.replace(/<button class="x"[^>]*>.*?<\/button>/,'');
+ document.body.append(pop);let hideT,cur=null;
+ const place=el=>{const r=el.getBoundingClientRect(),w=pop.offsetWidth||340,h=pop.offsetHeight||460;let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(innerWidth-w-12,x));let y=r.top-h-14;if(y<12)y=Math.min(innerHeight-h-12,r.bottom+14);pop.style.left=x+'px';pop.style.top=Math.max(12,y)+'px'};
+ const show=el=>{clearTimeout(hideT);cur=el;place(el);pop.classList.add('on')};
+ const hide=()=>{hideT=setTimeout(()=>pop.classList.remove('on'),220)};
+ [...document.querySelectorAll('.hello,.photo img,.nav .brand .av')].forEach(el=>{el.addEventListener('mouseenter',()=>show(el));el.addEventListener('mouseleave',hide)});
+ pop.addEventListener('mouseenter',()=>clearTimeout(hideT));pop.addEventListener('mouseleave',hide);
+ addEventListener('scroll',()=>{if(pop.classList.contains('on')&&cur)place(cur)},{passive:true});
+})();
 
 })();
