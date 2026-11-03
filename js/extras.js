@@ -210,7 +210,7 @@ $$('.flip').forEach(fl=>{
  const place=el=>{const r=el.getBoundingClientRect(),w=pop.offsetWidth||340,h=pop.offsetHeight||460;let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(innerWidth-w-12,x));let y=r.top-h-14;if(y<12)y=Math.min(innerHeight-h-12,r.bottom+14);pop.style.left=x+'px';pop.style.top=Math.max(12,y)+'px'};
  const show=el=>{clearTimeout(hideT);cur=el;place(el);pop.classList.add('on')};
  const hide=()=>{hideT=setTimeout(()=>pop.classList.remove('on'),220)};
- [...document.querySelectorAll('.hello,.photo img,.nav .brand .av')].forEach(el=>{el.addEventListener('mouseenter',()=>show(el));el.addEventListener('mouseleave',hide)});
+ [...document.querySelectorAll('.hello,.nav .brand .av')].forEach(el=>{el.addEventListener('mouseenter',()=>show(el));el.addEventListener('mouseleave',hide)});
  pop.addEventListener('mouseenter',()=>clearTimeout(hideT));pop.addEventListener('mouseleave',hide);
  addEventListener('scroll',()=>{if(pop.classList.contains('on')&&cur)place(cur)},{passive:true});
 })();

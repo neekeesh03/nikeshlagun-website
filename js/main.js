@@ -87,7 +87,7 @@ btn.onclick=go;res.querySelectorAll('.opts button').forEach(b=>b.onclick=()=>{re
 const STICKER_MSG="Hey, it's Nikesh. If you know what to do and still can't start, you're not lazy, you're just stuck at the doorway. Everything here is to help you walk through it.";
 (function(){const bg=document.createElement('div');bg.className='stk-bg';bg.innerHTML='<div class="stk" role="dialog" aria-label="A note from Nikesh"><button class="x" aria-label="Close">&times;</button><img src="'+(location.pathname.includes('/a/')?'../':'')+'img/nikesh.jpg" alt="Nikesh Lagun"><p>'+STICKER_MSG+'</p><div class="sig">Nikesh</div><a class="say" href="mailto:lagunnikesh2064@gmail.com">Say hi back</a></div>';document.body.appendChild(bg);
 const open=()=>{if(matchMedia('(hover:hover) and (pointer:fine)').matches)return;bg.classList.add('on')},close=()=>bg.classList.remove('on');bg.onclick=e=>{if(e.target===bg||e.target.classList.contains('x'))close()};addEventListener('keydown',e=>{if(e.key==='Escape')close()});
-document.querySelectorAll('.hello,.photo img').forEach(el=>el.addEventListener('click',open));
+document.querySelectorAll('.hello').forEach(el=>el.addEventListener('click',open));
 document.querySelectorAll('.nav .brand').forEach(b=>{const av=b.querySelector('.av');if(av)av.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();open()})})})();
 
 /* hello chip */
