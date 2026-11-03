@@ -172,3 +172,7 @@ details.faq{background:#fff;border-radius:20px;padding:6px 24px;margin-bottom:12
 @media(max-width:900px){.feat1{grid-template-columns:1fr!important}.feat1 .im{min-height:0}.feat1 .bd{padding:28px}.moon{display:none}.hero.night .cover-big{margin-top:10px}.photo{margin:20px auto}.chipf{font-size:.75rem}.stats{gap:26px 10px}}
 
 @media(max-width:900px){.hero-art{padding:10px 0 50px}.hero-art>.cover,.hero-art>a.cover{width:190px}.hero-art .b2{left:calc(50% - 170px);bottom:10px;width:112px}.hero-art .b2 .cover{width:112px}.hello{right:50%;margin-right:-150px;bottom:-6px}}
+
+.article .body{overflow-wrap:anywhere}.article .body img,.article .body iframe,.article .body video{max-width:100%;height:auto}.article .body table,.article .body pre{display:block;max-width:100%;overflow-x:auto}.article .body figure,.article .body div{max-width:100%}
+
+.hero.small+.light{padding-top:50px}.hero.small+.sec{padding-top:70px}
