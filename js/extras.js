@@ -44,7 +44,7 @@ document.addEventListener('mouseover',e=>{const a=e.target.closest('a[href]');a&
 const albs=$$('.alb[data-audio]');
 if(albs.length){
  // lyrics: paste real lyrics here, keyed by file name
- const LYRICS={parkhiraxu:'',priya_phool:'',timi_ra_ma:'',mayalu:'',ekasi_timi:'',bhagi_jaun:''};
+ const LYRICS={"parkhiraxu": "Ajham bhari maya yo Timilai sadhai\nBudeskalma ma Hasideula sangai", "priya_phool": "Timi fula bhayesi maya\nMa bannai parigo kada\nNatra aru kasaile timlai\nChudi laijala\n\nMana bhari nai fuli dinu\nMa bhamara bani dulxu\nTimi sanga jivan bitauda\nSara duniyalai bhulxu", "timi_ra_ma": "Ekantama lagana malai sangai\nRamaula haii sangai sadhai\nMann ka kura pokhi\nTimi ra ma", "mayalu": "Jivan ko ranga\nBhare ma aja\nSapta indreni\nTimro nai majha\n\nTimlai nai kurera, basera, geeta gayera\nXodera jawauu, haat samai bhagauu yo sansara", "ekasi_timi": "heraile po malai aljaula ni\nbolai le po malai bagaula ni\nheraile po malai aljaula ni\nbolai le po malai bagaula ni", "bhagi_jaun": "bhagi jaun, maya hami dui, xadi yo sansar lai kainakai, kura haru ta.."};
  const songs=albs.map(c=>({el:c,src:c.dataset.audio,key:c.dataset.audio.split('/').pop().replace('.wav',''),title:$('h3',c).textContent,cover:$('.sleeve img',c)?.src||'',tag:$('.tag',c)?.textContent||''}));
  const ic={play:'<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',pause:'<svg viewBox="0 0 24 24"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>',prev:'<svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg>',next:'<svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg>',list:'<svg viewBox="0 0 24 24"><path d="M4 6h12v2H4zM4 11h12v2H4zM4 16h8v2H4zM18 11v7a3 3 0 1 1-2-2.8V11z"/></svg>',shuf:'<svg viewBox="0 0 24 24"><path d="M16 4h4v4l-1.6-1.6L5.4 19.4 4 18 17 5.4 16 4zM4 6l5 5-1.4 1.4L4 8.8zM15 14l5 5v-4h-2v.2L16.4 13.6z"/></svg>'};
  const bar=document.createElement('div');bar.className='pbar';bar.setAttribute('role','region');bar.setAttribute('aria-label','Music player');
@@ -76,6 +76,8 @@ if(albs.length){
  document.addEventListener('cdplay',()=>{if(!au.paused)au.pause()});
  addEventListener('keydown',e=>{if(e.target.matches('input,textarea'))return;if(e.code==='Space'&&idx>=0&&!e.target.closest('button,a')){e.preventDefault();playBtn.click()}});
  if('mediaSession' in navigator){navigator.mediaSession.setActionHandler('nexttrack',()=>next(1));navigator.mediaSession.setActionHandler('previoustrack',()=>next(-1))}
+ // "Lyrics" button on every card
+ songs.forEach((s,i)=>{const pb=$('.playbtn',s.el);if(!pb)return;const lb=document.createElement('button');lb.type='button';lb.className='lyrbtn';lb.textContent='Lyrics';lb.onclick=ev=>{ev.stopPropagation();load(i,false);bar.classList.add('open');const tb=$$('.pb-tabs button',bar).find(b=>b.dataset.t==='l');tb&&tb.click()};pb.after(lb)});
  // "Play all" button under the sound button
  const sb=document.getElementById('soundbtn');if(sb){const pa=document.createElement('button');pa.type='button';pa.className='soundbtn';pa.style.marginLeft='10px';pa.innerHTML='<span>Play all songs</span>';pa.onclick=()=>load(0,true);sb.after(pa)}
  // cards: double-click the CD to send it to the player bar

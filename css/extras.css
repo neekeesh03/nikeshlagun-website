@@ -234,3 +234,9 @@ pre.mermaid:has(.pz){display:block!important;padding:0!important;background:none
 .review figcaption img{object-fit:cover}
 .newsnote{background:#fff;border-left:5px solid var(--orange);border-radius:14px;padding:16px 20px;box-shadow:0 10px 24px rgba(64,115,77,.1)}
 .newsnote p{margin:6px 0 0;color:var(--ink,#222)}
+
+.lyrbtn{display:inline-flex;align-items:center;margin:0 0 10px 8px;padding:7px 14px;border-radius:999px;border:1.5px solid var(--green);background:transparent;color:var(--green);font:600 13px Inter,sans-serif;cursor:pointer;vertical-align:top}
+.lyrbtn:hover{background:var(--mint)}
+.ainfo .playbtn{display:inline-flex!important}
+.pb-lyr{font-family:'Instrument Serif',serif}
+.pb-q[hidden],.pb-lyr[hidden]{display:none!important}
