@@ -82,40 +82,25 @@ if(albs.length){
  songs.forEach((s,i)=>{const d=$('.disc',s.el);d&&d.addEventListener('dblclick',()=>load(i,true))});
 }
 
-/* ---------- 3. research explorer ---------- */
+/* ---------- 3. research explorer (click a box to trace its path) ---------- */
 const mms=$$('.mm');
 if(mms.length){
- const tryEnh=()=>{mms.forEach(mm=>{const svg=$('svg',mm);if(!svg||mm.dataset.pz||mm.querySelector('.pie'))return;mm.dataset.pz=1;setTimeout(()=>{const s2=$('svg',mm);if(s2)enh(mm,s2)},700)})};
+ const tryEnh=()=>{mms.forEach(mm=>{const svg=$('svg',mm);if(!svg||mm.dataset.pz||mm.querySelector('.pie,.rtl'))return;mm.dataset.pz=1;setTimeout(()=>enh(mm,$('svg',mm)||svg),700)})};
  const mo=new MutationObserver(tryEnh);mms.forEach(m=>mo.observe(m,{childList:true,subtree:true}));tryEnh();setTimeout(tryEnh,2500);setTimeout(tryEnh,6000);
  function enh(mm,svg){
-  const box=document.createElement('div');box.className='pz';svg.parentNode.insertBefore(box,svg);box.append(svg);
-  const st={k:1,x:0,y:0};const ap=()=>{svg.style.transform=`translate(${st.x}px,${st.y}px) scale(${st.k})`;box.classList.toggle('can',st.k>1)};
-  const zoom=(f,cx,cy)=>{const r=box.getBoundingClientRect();cx=cx??r.width/2;cy=cy??r.height/2;const k=Math.max(1,Math.min(4,st.k*f));const s=k/st.k;st.x=cx-(cx-st.x)*s;st.y=cy-(cy-st.y)*s;st.k=k;if(k===1){st.x=0;st.y=0}ap()};
-  const tools=document.createElement('div');tools.className='pz-tools';tools.innerHTML='<button aria-label="Zoom in">+</button><button aria-label="Zoom out">&minus;</button><button aria-label="Reset">&#8634;</button><button aria-label="Full screen">&#9974;</button>';box.append(tools);
-  const [zi,zo,zr,zf]=$$('button',tools);zi.onclick=()=>zoom(1.4);zo.onclick=()=>zoom(1/1.4);zr.onclick=()=>{st.k=1;st.x=st.y=0;ap();clear()};zf.onclick=()=>{box.classList.toggle('pz-full')};
-  addEventListener('keydown',e=>{if(e.key==='Escape')box.classList.remove('pz-full')});
-  box.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();const r=box.getBoundingClientRect();zoom(e.deltaY<0?1.15:1/1.15,e.clientX-r.left,e.clientY-r.top)},{passive:false});
-  let drag=null;box.addEventListener('pointerdown',e=>{if(st.k<=1||e.target.closest('.pz-tools'))return;drag={x:e.clientX-st.x,y:e.clientY-st.y,moved:false};box.classList.add('drag');box.setPointerCapture(e.pointerId)});
-  box.addEventListener('pointermove',e=>{if(!drag)return;st.x=e.clientX-drag.x;st.y=e.clientY-drag.y;drag.moved=true;ap()});
-  const end=()=>{drag=null;box.classList.remove('drag')};box.addEventListener('pointerup',end);box.addEventListener('pointercancel',end);
-  // trace path on click (flowcharts)
-  const nodes=$$('g.node',svg),edges=$$('.edgePaths path,path.flowchart-link',svg);
+  const nodes=$$('g.node',svg),edges=$$('path.flowchart-link',svg);
   const nid=n=>{const m=(n.id||'').match(/flowchart-(.+)-\d+$/);return m?m[1]:null};
   const idset=new Set(nodes.map(nid).filter(Boolean));
-  const ed=edges.map(p=>{let s=null,e=null;const m=(p.id||'').match(/(?:^|-)L[_-](.+)_\d+$/);if(m){const parts=m[1].split('_');for(let i=1;i<parts.length;i++){const a=parts.slice(0,i).join('_'),b=parts.slice(i).join('_');if(idset.has(a)&&idset.has(b)){s=a;e=b;break}}}
-   if(!s){const c=[...p.classList];const a=c.find(x=>x.startsWith('LS-')),b=c.find(x=>x.startsWith('LE-'));if(a&&b){s=a.slice(3);e=b.slice(3)}}return{p,s,e}}).filter(x=>x.s&&x.e);
-  function clear(){box.classList.remove('trace');$$('.hl,.sel',svg).forEach(x=>x.classList.remove('hl','sel'))}
-  if(nodes.length&&ed.length){
-   const hint=document.createElement('p');hint.className='pz-hint';hint.textContent='Click a box to trace what leads to it and what comes from it. Use + / - to zoom, drag to move, or the corner button for full screen.';(mm.querySelector('pre')||box).after(hint);
-   nodes.forEach(n=>n.addEventListener('click',e=>{if(drag&&drag.moved)return;e.stopPropagation();const id=nid(n);if(!id)return;
-    if(n.classList.contains('sel')){clear();return}
-    clear();const up=new Set([id]),dn=new Set([id]);let ch=true;
-    while(ch){ch=false;ed.forEach(x=>{if(dn.has(x.s)&&!dn.has(x.e)){dn.add(x.e);ch=true}if(up.has(x.e)&&!up.has(x.s)){up.add(x.s);ch=true}})}
-    const all=new Set([...up,...dn]);box.classList.add('trace');
-    nodes.forEach(m=>{const i=nid(m);if(i&&all.has(i))m.classList.add('hl')});n.classList.add('sel');
-    ed.forEach(x=>{if((up.has(x.s)&&up.has(x.e))||(dn.has(x.s)&&dn.has(x.e)))x.p.classList.add('hl')})}));
-   box.addEventListener('click',e=>{if(!e.target.closest('.node,.pz-tools'))clear()});
-  }else{const hint=document.createElement('p');hint.className='pz-hint';hint.textContent='Use + / - to zoom, drag to move, or the corner button for full screen.';(mm.querySelector('pre')||box).after(hint)}
+  const ed=edges.map(p=>{let s=null,e=null;const m=(p.id||'').match(/(?:^|-)L[_-](.+)_\d+$/);if(m){const parts=m[1].split('_');for(let i=1;i<parts.length;i++){const a=parts.slice(0,i).join('_'),b=parts.slice(i).join('_');if(idset.has(a)&&idset.has(b)){s=a;e=b;break}}}return{p,s,e}}).filter(x=>x.s&&x.e);
+  if(!nodes.length||!ed.length)return;
+  const clear=()=>{mm.classList.remove('trace');$$('.hl,.sel',svg).forEach(x=>x.classList.remove('hl','sel'))};
+  const hint=document.createElement('p');hint.className='pz-hint';hint.textContent='Tip: click any box to light up everything that leads to it and comes from it. Click again to reset.';(svg.closest('pre')||svg).after(hint);
+  nodes.forEach(n=>n.addEventListener('click',ev=>{ev.stopPropagation();const id=nid(n);if(!id)return;if(n.classList.contains('sel')){clear();return}
+   clear();const up=new Set([id]),dn=new Set([id]);let ch=true;
+   while(ch){ch=false;ed.forEach(x=>{if(dn.has(x.s)&&!dn.has(x.e)){dn.add(x.e);ch=true}if(up.has(x.e)&&!up.has(x.s)){up.add(x.s);ch=true}})}
+   const all=new Set([...up,...dn]);mm.classList.add('trace');nodes.forEach(m=>{const i=nid(m);if(i&&all.has(i))m.classList.add('hl')});n.classList.add('sel');
+   ed.forEach(x=>{if((up.has(x.s)&&up.has(x.e))||(dn.has(x.s)&&dn.has(x.e)))x.p.classList.add('hl')})}));
+  mm.addEventListener('click',ev=>{if(!ev.target.closest('.node'))clear()});
  }
 }
 
@@ -184,9 +169,29 @@ if(mms.length){
  const show=(again)=>{form.hidden=true;done.hidden=false;if(again)done.querySelector('.lead-msg').textContent='Welcome back.'};
  try{if(localStorage.getItem(KEY)==='1')show(true)}catch(_){}
  form.addEventListener('submit',async e=>{e.preventDefault();err.hidden=true;const email=inp.value.trim();
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){err.textContent='Please enter a valid email address.';err.hidden=false;inp.focus();return}
-  btn.disabled=true;btn.firstChild.textContent='Unlocking... ';
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){err.textContent='That email does not look right. Mind checking it?';err.hidden=false;inp.focus();return}
+  btn.disabled=true;btn.firstChild.textContent='Unlocking your copy... ';
   try{await fetch('https://nikeshlagun.substack.com/api/v1/free?nojs=true',{method:'POST',mode:'no-cors',body:new URLSearchParams({email,first_url:location.href,first_referrer:document.referrer||'',current_url:location.href,current_referrer:document.referrer||'',referral_code:'',source:'switch-on-free-book'})})}catch(_){}
   try{localStorage.setItem(KEY,'1')}catch(_){}
   show(false);done.scrollIntoView({block:'nearest',behavior:'smooth'})});
+})();
+
+(function(){const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+/* ---------- 7. timeline reveal ---------- */
+$$('.rtl').forEach(t=>{if(!('IntersectionObserver' in window)){t.classList.add('go');return}new IntersectionObserver((es,io)=>{if(es[0].isIntersecting){io.disconnect();t.classList.add('go')}},{threshold:.25}).observe(t)});
+
+/* ---------- 8. page-flip book ---------- */
+$$('.flip').forEach(fl=>{
+ const leaves=$$('.leaf',fl),n=leaves.length,wrap=fl.closest('.flipwrap'),prev=$('.fprev',wrap),next=$('.fnext',wrap),dots=$$('.flipdots i',wrap);let cur=0;
+ const setZ=()=>leaves.forEach((l,i)=>{l.style.zIndex=l.classList.contains('f')?i+1:n-i});
+ function render(){leaves.forEach((l,i)=>l.classList.toggle('f',i<cur));fl.classList.toggle('mid',cur>0&&cur<n);fl.classList.toggle('end',cur===n);prev.disabled=cur===0;next.disabled=cur===n;
+  dots.forEach((d,i)=>d.classList.toggle('on',i===cur));setTimeout(setZ,380)}
+ function go(d){cur=Math.max(0,Math.min(n,cur+d));render()}
+ prev.onclick=()=>go(-1);next.onclick=()=>go(1);
+ leaves.forEach((l,i)=>l.addEventListener('click',e=>{if(e.target.closest('a,button'))return;cur=l.classList.contains('f')?i:i+1;render()}));
+ wrap.setAttribute('tabindex','0');wrap.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1)});
+ setZ();render();
+ if('IntersectionObserver' in window&&!matchMedia('(prefers-reduced-motion:reduce)').matches)new IntersectionObserver((es,io)=>{if(es[0].isIntersecting){io.disconnect();setTimeout(()=>{if(cur===0)go(1)},900)}},{threshold:.6}).observe(fl);
+});
+
 })();
