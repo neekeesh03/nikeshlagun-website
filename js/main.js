@@ -1,8 +1,21 @@
-const nav=document.getElementById('nav');addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>30));
-document.getElementById('burger').onclick=()=>document.getElementById('links').classList.toggle('open');
+const nav=document.getElementById('nav');addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>30),{passive:true});
+/* menu: mobile burger + dropdowns, with keyboard and screen reader support */
+(function(){const bur=document.getElementById('burger'),links=document.getElementById('links');if(!bur||!links)return;
+bur.setAttribute('aria-expanded','false');bur.setAttribute('aria-controls','links');bur.type='button';
+const setMenu=o=>{links.classList.toggle('open',o);bur.setAttribute('aria-expanded',String(o));bur.setAttribute('aria-label',o?'Close menu':'Menu');document.documentElement.classList.toggle('menu-open',o)};
+bur.addEventListener('click',()=>setMenu(!links.classList.contains('open')));
+links.addEventListener('click',e=>{if(e.target.closest('a'))setMenu(false)});
+const dds=[...document.querySelectorAll('.dd')];
+dds.forEach(d=>{const b=d.querySelector('.ddbtn');if(!b)return;b.setAttribute('aria-expanded','false');b.setAttribute('aria-haspopup','true');
+ b.addEventListener('click',e=>{e.stopPropagation();const o=!d.classList.contains('open');dds.forEach(x=>{x.classList.remove('open');x.querySelector('.ddbtn')?.setAttribute('aria-expanded','false')});d.classList.toggle('open',o);b.setAttribute('aria-expanded',String(o))});
+ d.addEventListener('mouseleave',()=>{d.classList.remove('open');b.setAttribute('aria-expanded','false')})});
+document.addEventListener('click',e=>{if(!e.target.closest('.dd'))dds.forEach(x=>{x.classList.remove('open');x.querySelector('.ddbtn')?.setAttribute('aria-expanded','false')})});
+addEventListener('keydown',e=>{if(e.key==='Escape'){if(links.classList.contains('open')){setMenu(false);bur.focus()}dds.forEach(x=>{x.classList.remove('open');x.querySelector('.ddbtn')?.setAttribute('aria-expanded','false')})}});
+matchMedia('(min-width:901px)').addEventListener?.('change',m=>{if(m.matches)setMenu(false)});
+})();
 const rv=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('in')),{threshold:.01,rootMargin:'0px 0px 12% 0px'});document.querySelectorAll('.reveal').forEach(e=>rv.observe(e));
 const bt=document.getElementById('blur');if(bt){const walk=n=>{[...n.childNodes].forEach(c=>{if(c.nodeType===3){const f=document.createDocumentFragment();c.textContent.split(/\s+/).filter(Boolean).forEach(w=>{const s=document.createElement('span');s.className='w';s.textContent=w;f.appendChild(s)});c.replaceWith(f)}else walk(c)})};walk(bt);const ws=[...bt.querySelectorAll('.w')];const upd=()=>{const r=bt.getBoundingClientRect(),vh=innerHeight;const p=Math.min(1,Math.max(0,(vh*.85-r.top)/(vh*.55+r.height*.4)));ws.forEach((w,i)=>w.classList.toggle('on',i/ws.length<p))};addEventListener('scroll',upd,{passive:true});upd()}
-const cf=document.getElementById('cform');if(cf)cf.onsubmit=e=>{e.preventDefault();const d=new FormData(cf);location.href='mailto:lagunnikesh2064@gmail.com?subject='+encodeURIComponent(d.get('subject'))+'&body='+encodeURIComponent(d.get('message')+'\n\n'+d.get('name')+' ('+d.get('email')+') '+d.get('org'))};
+const cf=document.getElementById('cform');if(cf)cf.onsubmit=e=>{e.preventDefault();const d=new FormData(cf);for(const k of ['name','email','org','subject','message'])d.set(k,String(d.get(k)||'').slice(0,k==='message'?1500:200).trim());location.href='mailto:lagunnikesh2064@gmail.com?subject='+encodeURIComponent(d.get('subject'))+'&body='+encodeURIComponent(d.get('message')+'\n\n'+d.get('name')+' ('+d.get('email')+') '+d.get('org'))};
 /* 15-second hand check */
 const hs=document.getElementById('handStage');if(hs){
 const STEPS=[[3,'Look at your hand','Just look at it. Nothing else.',0],[3,'Pick one finger in your mind','Decide to lift it, but do NOT move it.',1],[2,'Switch to a different finger','Change your mind. Still do not move.',2],[1,'Now lift one finger','Any finger. Go.',3],[6,'Notice what happened','Did it feel smooth, blocked, or did something else move?',4]];
@@ -24,7 +37,7 @@ const ps=document.getElementById("posts");if(ps){const q=document.getElementById
 /* auto reveal + stagger */
 document.querySelectorAll('.card,.post,.bk,.review,.store,.sec-head,.cta-box,.eeg-note,.specs>div').forEach((e,i)=>{if(!e.classList.contains('reveal')){e.classList.add('reveal');e.style.transitionDelay=(i%4)*35+'ms';rv.observe(e)}});
 /* scroll progress */
-const pb=document.createElement('div');pb.className='progress';document.body.appendChild(pb);addEventListener('scroll',()=>{pb.style.width=(scrollY/(document.documentElement.scrollHeight-innerHeight)*100)+'%'},{passive:true});
+const pb=document.createElement('div');pb.className='progress';document.body.appendChild(pb);addEventListener('scroll',()=>{const m=document.documentElement.scrollHeight-innerHeight;pb.style.width=(m>0?Math.min(100,scrollY/m*100):0)+'%'},{passive:true});
 /* count up */
 const co=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;co.unobserve(e.target);const el=e.target,n=+el.dataset.count,sf=el.dataset.suffix||'',t0=performance.now();const tick=t=>{const p=Math.min(1,(t-t0)/1600),v=Math.round(n*(1-Math.pow(1-p,3)));el.textContent=v.toLocaleString('en-US')+(p>=1?sf:'');if(p<1)requestAnimationFrame(tick)};requestAnimationFrame(tick)}),{threshold:.5});document.querySelectorAll('[data-count]').forEach(e=>co.observe(e));
 /* EEG sweep monitor */
@@ -105,14 +118,15 @@ document.querySelectorAll('.hero.small').forEach(h=>{const e=h.querySelector('.e
 document.querySelectorAll('[data-share]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const u=encodeURIComponent(location.href),t=encodeURIComponent(document.title);const k=a.dataset.share;if(k==='x')window.open('https://twitter.com/intent/tweet?url='+u+'&text='+t,'_blank','noopener');else if(k==='in')window.open('https://www.linkedin.com/sharing/share-offsite/?url='+u,'_blank','noopener');else{navigator.clipboard&&navigator.clipboard.writeText(location.href);a.firstChild.textContent='Copied! '}}));
 
 /* v7: search palette + back to top */
-(function(){const root=(document.querySelector('script[src$="js/main.js"]').getAttribute('src')||'js/main.js').replace('js/main.js','');
+(function(){const ms=document.querySelector('script[src*="js/main.js"]');const root=ms?(ms.getAttribute('src')||'').replace(/js\/main\.js.*$/,''):(location.pathname.includes('/a/')?'../':'');
 const bg=document.createElement('div');bg.className='srch-bg';bg.innerHTML='<div class="srch" role="dialog" aria-label="Search"><input type="search" placeholder="Search pages, essays, books and papers" aria-label="Search"><div class="srch-res"></div><div class="srch-foot"><span>&uarr;&darr; to move</span><span>Enter to open</span><span>Esc to close</span></div></div>';document.body.appendChild(bg);
 const inp=bg.querySelector('input'),res=bg.querySelector('.srch-res');let loaded=false,sel=0,list=[];
 const load=()=>new Promise(r=>{if(window.SITE_INDEX)return r();const s=document.createElement('script');s.src=root+'js/search-index.js';s.onload=r;document.head.appendChild(s)});
-const url=e=>e.ext?e.u:root+e.u;
+const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const url=e=>e.ext?(/^https:\/\//.test(e.u)?e.u:'#'):root+String(e.u).replace(/^[\/\\]+|^[a-z]+:/gi,'');
 function render(q){q=q.trim().toLowerCase();const toks=q.split(/\s+/).filter(Boolean);let items=window.SITE_INDEX||[];
  if(toks.length){items=items.map(e=>{const T=e.t.toLowerCase(),D=(e.d+' '+e.b).toLowerCase();let s=0;for(const t of toks){if(T.includes(t))s+=5+(T.startsWith(t)?3:0);else if(D.includes(t))s+=1;else return null}return {e,s}}).filter(Boolean).sort((a,b)=>b.s-a.s).map(x=>x.e)}else{items=items.filter(e=>e.k==='Page'||e.k==='Book').slice(0,8)}
- list=items.slice(0,12);sel=0;res.innerHTML=list.length?list.map((e,i)=>'<a href="'+url(e)+'"'+(e.ext?' target="_blank" rel="noopener"':'')+' class="'+(i===0?'sel':'')+'"><span class="k">'+e.k+'</span><b>'+e.t.replace(/</g,'&lt;')+'</b><span class="d">'+(e.d||'').replace(/</g,'&lt;')+'</span></a>').join(''):'<div class="srch-empty">No matches. Try a shorter word.</div>'}
+ list=items.slice(0,12);sel=0;res.innerHTML=list.length?list.map((e,i)=>'<a href="'+esc(url(e))+'"'+(e.ext?' target="_blank" rel="noopener"':'')+' class="'+(i===0?'sel':'')+'"><span class="k">'+esc(e.k)+'</span><b>'+esc(e.t)+'</b><span class="d">'+esc(e.d||'')+'</span></a>').join(''):'<div class="srch-empty">No matches. Try a shorter word.</div>'}
 const open=async()=>{await load();bg.classList.add('on');inp.value='';render('');setTimeout(()=>inp.focus(),30)},close=()=>bg.classList.remove('on');
 const mark=()=>[...res.children].forEach((a,i)=>a.classList.toggle('sel',i===sel));
 inp.addEventListener('input',()=>render(inp.value));

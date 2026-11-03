@@ -240,3 +240,9 @@ pre.mermaid:has(.pz){display:block!important;padding:0!important;background:none
 .ainfo .playbtn{display:inline-flex!important}
 .pb-lyr{font-family:'Instrument Serif',serif}
 .pb-q[hidden],.pb-lyr[hidden]{display:none!important}
+
+/* ---- bug sweep fixes ---- */
+.article .body pre,.body pre{white-space:pre-wrap;word-break:break-word;overflow-x:auto;max-width:100%;background:var(--mint-l,#e6eee8);padding:14px 16px;border-radius:12px;font-size:.92rem;line-height:1.6}
+.article .body pre code,.body pre code{white-space:inherit;font-family:inherit}
+.article .body a{overflow-wrap:anywhere}
+:focus-visible{outline:2.5px solid var(--orange);outline-offset:3px;border-radius:6px}
