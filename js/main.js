@@ -98,3 +98,27 @@ const ns2=document.getElementById('news');if(ns2&&!ns2.dataset.plane)plane(ns2,n
 (function(){const chips=[...document.querySelectorAll('.chipf')];chips.forEach(c=>c.addEventListener('click',e=>{if(e.target.closest('.pop a'))return;const was=c.classList.contains('open');chips.forEach(x=>x.classList.remove('open'));if(!was)c.classList.add('open');e.stopPropagation()}));document.addEventListener('click',()=>chips.forEach(x=>x.classList.remove('open')))})();
 /* album CDs peek out when scrolled into view */
 (function(){const al=[...document.querySelectorAll('.alb')];if(!al.length)return;const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const i=al.indexOf(e.target);setTimeout(()=>e.target.classList.add('peek'),250+i*220);io.unobserve(e.target)}}),{threshold:.5});al.forEach(a=>io.observe(a))})();
+
+/* v6: hero watermark word, doc scrollspy, share links */
+document.querySelectorAll('.hero.small').forEach(h=>{const e=h.querySelector('.eyebrow');const w=(e?e.textContent:document.title.split('|')[0]).replace(/\s*[&·].*$/,'').trim().split(' ')[0];h.setAttribute('data-word',w.slice(0,12))});
+(function(){const links=[...document.querySelectorAll('.toc-v a')];if(!links.length)return;const map=new Map(links.map(a=>[a.getAttribute('href').slice(1),a]));const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){links.forEach(l=>l.classList.remove('on'));const a=map.get(e.target.id);if(a)a.classList.add('on')}}),{rootMargin:'-20% 0px -70% 0px'});map.forEach((a,id)=>{const el=document.getElementById(id);if(el)io.observe(el)})})();
+document.querySelectorAll('[data-share]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const u=encodeURIComponent(location.href),t=encodeURIComponent(document.title);const k=a.dataset.share;if(k==='x')window.open('https://twitter.com/intent/tweet?url='+u+'&text='+t,'_blank','noopener');else if(k==='in')window.open('https://www.linkedin.com/sharing/share-offsite/?url='+u,'_blank','noopener');else{navigator.clipboard&&navigator.clipboard.writeText(location.href);a.firstChild.textContent='Copied! '}}));
+
+/* v7: search palette + back to top */
+(function(){const root=(document.querySelector('script[src$="js/main.js"]').getAttribute('src')||'js/main.js').replace('js/main.js','');
+const bg=document.createElement('div');bg.className='srch-bg';bg.innerHTML='<div class="srch" role="dialog" aria-label="Search"><input type="search" placeholder="Search pages, essays, books and papers" aria-label="Search"><div class="srch-res"></div><div class="srch-foot"><span>&uarr;&darr; to move</span><span>Enter to open</span><span>Esc to close</span></div></div>';document.body.appendChild(bg);
+const inp=bg.querySelector('input'),res=bg.querySelector('.srch-res');let loaded=false,sel=0,list=[];
+const load=()=>new Promise(r=>{if(window.SITE_INDEX)return r();const s=document.createElement('script');s.src=root+'js/search-index.js';s.onload=r;document.head.appendChild(s)});
+const url=e=>e.ext?e.u:root+e.u;
+function render(q){q=q.trim().toLowerCase();const toks=q.split(/\s+/).filter(Boolean);let items=window.SITE_INDEX||[];
+ if(toks.length){items=items.map(e=>{const T=e.t.toLowerCase(),D=(e.d+' '+e.b).toLowerCase();let s=0;for(const t of toks){if(T.includes(t))s+=5+(T.startsWith(t)?3:0);else if(D.includes(t))s+=1;else return null}return {e,s}}).filter(Boolean).sort((a,b)=>b.s-a.s).map(x=>x.e)}else{items=items.filter(e=>e.k==='Page'||e.k==='Book').slice(0,8)}
+ list=items.slice(0,12);sel=0;res.innerHTML=list.length?list.map((e,i)=>'<a href="'+url(e)+'"'+(e.ext?' target="_blank" rel="noopener"':'')+' class="'+(i===0?'sel':'')+'"><span class="k">'+e.k+'</span><b>'+e.t.replace(/</g,'&lt;')+'</b><span class="d">'+(e.d||'').replace(/</g,'&lt;')+'</span></a>').join(''):'<div class="srch-empty">No matches. Try a shorter word.</div>'}
+const open=async()=>{await load();bg.classList.add('on');inp.value='';render('');setTimeout(()=>inp.focus(),30)},close=()=>bg.classList.remove('on');
+const mark=()=>[...res.children].forEach((a,i)=>a.classList.toggle('sel',i===sel));
+inp.addEventListener('input',()=>render(inp.value));
+inp.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();sel=Math.min(list.length-1,sel+1);mark();res.children[sel]?.scrollIntoView({block:'nearest'})}else if(e.key==='ArrowUp'){e.preventDefault();sel=Math.max(0,sel-1);mark();res.children[sel]?.scrollIntoView({block:'nearest'})}else if(e.key==='Enter'){const a=res.children[sel];if(a&&a.href){if(a.target==='_blank')window.open(a.href,'_blank','noopener');else location.href=a.href}}});
+bg.addEventListener('click',e=>{if(e.target===bg)close()});
+addEventListener('keydown',e=>{const tag=(e.target.tagName||'').toLowerCase();if(e.key==='Escape')close();if((e.key==='/'&&tag!=='input'&&tag!=='textarea')||((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k')){e.preventDefault();open()}});
+document.querySelectorAll('.navsearch').forEach(b=>b.addEventListener('click',open));
+const tt=document.createElement('button');tt.className='totop';tt.setAttribute('aria-label','Back to top');tt.innerHTML='&uarr;';tt.onclick=()=>scrollTo({top:0,behavior:'smooth'});document.body.appendChild(tt);addEventListener('scroll',()=>tt.classList.toggle('on',scrollY>900),{passive:true});
+})();
