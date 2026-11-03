@@ -122,3 +122,30 @@ addEventListener('keydown',e=>{const tag=(e.target.tagName||'').toLowerCase();if
 document.querySelectorAll('.navsearch').forEach(b=>b.addEventListener('click',open));
 const tt=document.createElement('button');tt.className='totop';tt.setAttribute('aria-label','Back to top');tt.innerHTML='&uarr;';tt.onclick=()=>scrollTo({top:0,behavior:'smooth'});document.body.appendChild(tt);addEventListener('scroll',()=>tt.classList.toggle('on',scrollY>900),{passive:true});
 })();
+
+/* music: play a preview when a CD slides out */
+(function(){const al=[...document.querySelectorAll('.alb[data-audio]')];if(!al.length)return;
+const btn=document.getElementById('soundbtn');let soundOn=false,cur=null,raf=0;const MAXV=.7;
+const hov=matchMedia('(hover:hover)').matches;
+const a=new Audio();a.preload='none';
+function label(c,p){const s=c.querySelector('.playbtn span');if(s)s.textContent=p?'Pause':'Play preview'}
+function fade(to,ms,done){cancelAnimationFrame(raf);const from=a.volume,t0=performance.now();(function s(t){const k=Math.min(1,(t-t0)/ms);a.volume=Math.max(0,Math.min(1,from+(to-from)*k));if(k<1)raf=requestAnimationFrame(s);else if(done)done()})(t0)}
+function stop(c){if(!c)return;c.classList.remove('playing');label(c,false);if(c===cur){const x=c;fade(0,350,()=>{if(cur===x){a.pause();cur=null}})}}
+function play(c){if(cur&&cur!==c){cur.classList.remove('playing');label(cur,false)}
+ cancelAnimationFrame(raf);if(cur!==c){a.pause();a.src=c.dataset.audio;a.currentTime=0;cur=c}
+ a.volume=0;const p=a.play();if(p&&p.catch)p.catch(()=>{c.classList.remove('playing');label(c,false)});
+ c.classList.add('playing');label(c,true);fade(MAXV,600)}
+a.addEventListener('timeupdate',()=>{if(cur&&a.duration&&a.currentTime>a.duration-1.2&&a.volume>0.01&&!a._f){a._f=1;fade(0,1100)}});
+a.addEventListener('ended',()=>{a._f=0;if(cur){cur.classList.remove('playing');label(cur,false);cur=null}});
+a.addEventListener('play',()=>{a._f=0});
+function setSound(v){soundOn=v;if(btn){btn.classList.toggle('on',v);btn.setAttribute('aria-pressed',v);btn.querySelector('span').textContent=v?'Sound on (hover a record)':'Tap to turn sound on'}if(!v&&cur)stop(cur)}
+if(btn)btn.addEventListener('click',()=>setSound(!soundOn));
+al.forEach(c=>{
+ if(hov){c.addEventListener('mouseenter',()=>{if(soundOn)play(c)});c.addEventListener('mouseleave',()=>{if(c===cur)stop(c)})}
+ const tog=()=>{if(c.classList.contains('playing')){stop(c)}else{if(!soundOn)setSound(true);play(c)}};
+ c.querySelector('.playbtn').addEventListener('click',e=>{e.stopPropagation();tog()});
+ c.querySelector('.disc').addEventListener('click',()=>{if(!hov)tog();else if(!c.classList.contains('playing')){if(!soundOn)setSound(true);play(c)}});
+});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&cur)stop(cur)});
+window.__musicPrev={get paused(){return a.paused},get vol(){return a.volume},get cur(){return cur},get soundOn(){return soundOn}};
+})();
