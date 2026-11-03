@@ -210,3 +210,18 @@ details.faq{background:#fff;border-radius:20px;padding:6px 24px;margin-bottom:12
 @media(hover:none){.alb .cd{transform:translateX(80px)}}
 
 .disc{width:245px}.alb.peek .cd{transform:translateX(42px)}.alb:hover .cd{transform:translateX(92px) rotate(300deg)}@media(max-width:520px){.disc{width:250px}}
+
+/* CD: slide on .cd, spin on .cdi */
+.cd{background:none!important;box-shadow:none!important;border-radius:50%;transition:transform .9s cubic-bezier(.2,.9,.3,1)}
+.cd:before{display:none}
+.cdi{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:conic-gradient(from 0deg,#fdfdfd,#C7D9CC,#f6e4d2,#B7A7D9,#fdfdfd,#C7D9CC,#f6e4d2,#B7A7D9,#fdfdfd);box-shadow:0 8px 22px rgba(0,0,0,.28),inset 0 0 0 3px rgba(255,255,255,.6);animation:cdspin 2.2s linear infinite;animation-play-state:paused}
+.cdi:before{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,0) 0 3px,rgba(0,0,0,.055) 3px 4px)}
+.cdi .cdm{position:absolute;left:50%;top:7px;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 2px #fff}
+.cdi .cdl{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:radial-gradient(circle,#F2F2F2 0 22%,#40734D 24% 100%);box-shadow:0 0 0 4px rgba(255,255,255,.7)}
+@keyframes cdspin{to{transform:rotate(360deg)}}
+.alb:hover .cdi,.alb:focus-within .cdi{animation-play-state:running}
+.alb.peek .cd{transform:translateX(42px)}.alb:hover .cd{transform:translateX(92px)}
+@media(hover:none){.cdi{animation-play-state:running;animation-duration:4s}}
+.alb.feature{grid-column:1/-1;background:linear-gradient(135deg,#fff,#f2ede6)}
+.alb.feature .ainfo h3{font-size:2rem}
+@media(prefers-reduced-motion:reduce){.cdi{animation:none!important}}
