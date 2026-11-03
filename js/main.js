@@ -87,9 +87,14 @@ btn.onclick=go;res.querySelectorAll('.opts button').forEach(b=>b.onclick=()=>{re
 const STICKER_MSG="Hey, it's Nikesh. If you know what to do and still can't start, you're not lazy, you're just stuck at the doorway. Everything here is to help you walk through it.";
 (function(){const bg=document.createElement('div');bg.className='stk-bg';bg.innerHTML='<div class="stk" role="dialog" aria-label="A note from Nikesh"><button class="x" aria-label="Close">&times;</button><img src="'+(location.pathname.includes('/a/')?'../':'')+'img/nikesh.jpg" alt="Nikesh Lagun"><p>'+STICKER_MSG+'</p><div class="sig">Nikesh</div><a class="say" href="mailto:lagunnikesh2064@gmail.com">Say hi back</a></div>';document.body.appendChild(bg);
 const open=()=>bg.classList.add('on'),close=()=>bg.classList.remove('on');bg.onclick=e=>{if(e.target===bg||e.target.classList.contains('x'))close()};addEventListener('keydown',e=>{if(e.key==='Escape')close()});
-document.querySelectorAll('.hello,.photo img,.photo .chipf').forEach(el=>el.addEventListener('click',open));
+document.querySelectorAll('.hello,.photo img').forEach(el=>el.addEventListener('click',open));
 document.querySelectorAll('.nav .brand').forEach(b=>{const av=b.querySelector('.av');if(av)av.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();open()})})})();
 
 /* hello chip */
 const hb2=document.querySelector('.hello');if(hb2)setTimeout(()=>hb2.classList.add('on'),900);
 const ns2=document.getElementById('news');if(ns2&&!ns2.dataset.plane)plane(ns2,ns2.querySelector('.sub-form button'));
+
+/* chip popovers: tap to toggle, tap outside to close */
+(function(){const chips=[...document.querySelectorAll('.chipf')];chips.forEach(c=>c.addEventListener('click',e=>{if(e.target.closest('.pop a'))return;const was=c.classList.contains('open');chips.forEach(x=>x.classList.remove('open'));if(!was)c.classList.add('open');e.stopPropagation()}));document.addEventListener('click',()=>chips.forEach(x=>x.classList.remove('open')))})();
+/* album CDs peek out when scrolled into view */
+(function(){const al=[...document.querySelectorAll('.alb')];if(!al.length)return;const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const i=al.indexOf(e.target);setTimeout(()=>e.target.classList.add('peek'),250+i*220);io.unobserve(e.target)}}),{threshold:.5});al.forEach(a=>io.observe(a))})();
